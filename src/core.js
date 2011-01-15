@@ -64,6 +64,7 @@ var jQuery = function( selector, context ) {
 	readyList,
 
 	// The ready event handler
+    ///it will call jQuery.ready
 	DOMContentLoaded,
 
 	// Save a reference to some core methods
@@ -107,20 +108,27 @@ function init ( selector, context ) {
 			match = quickExpr.exec( selector );
 
 			// Verify a match, and that no context was specified for #id
-            ///(match[1] || !context) means you should not have and #id selector
-            ///and with a context, if you use #id selector, context should be empty
+            ///(match[1] || !context) means you should not have an #id selector
+            ///with a context, if you use #id selector, context should be empty
+            //it matches the case jQuery("<div />")
             if ( match && (match[1] || !context) ) {
 
 				// HANDLE: $(html) -> $(array)
+                ///convert html into array of dom elements
 				if ( match[1] ) {
+                    ///doc is used to create element
 					doc = (context ? context.ownerDocument || context : document);
 
 					// If a single string is passed in and it's a single tag
 					// just do a createElement and skip the rest
 					ret = rsingleTag.exec( selector );
-
+                    ///single tag markup
 					if ( ret ) {
+                        ///you can do initialization like
+                        ///$("<div />", {id : "myid", style : "color:red"}
 						if ( jQuery.isPlainObject( context ) ) {
+                            ///reuse selector variable for other purpose, holding
+                            ///dom element array
 							selector = [ document.createElement( ret[1] ) ];
 							jQuery.fn.attr.call( selector, context, true );
 
@@ -129,10 +137,13 @@ function init ( selector, context ) {
 						}
 
 					} else {
+                        ///not simple markup but some
+                        ///more complext markup eg jQuery("<div id='x' />");
 						ret = jQuery.buildFragment( [ match[1] ], [ doc ] );
 						selector = (ret.cacheable ? jQuery(ret.fragment).clone()[0] : ret.fragment).childNodes;
 					}
 
+                    ///here selector is html element
 					return jQuery.merge( this, selector );
 
 				// HANDLE: $("#id")
@@ -159,6 +170,7 @@ function init ( selector, context ) {
 				}
 
 			// HANDLE: $("TAG")
+            /// this does not match $("tag", context) or $("body div");
 			} else if ( !context && !rnonword.test( selector ) ) {
 				this.selector = selector;
 				this.context = document;
@@ -166,11 +178,13 @@ function init ( selector, context ) {
 				return jQuery.merge( this, selector );
 
 			// HANDLE: $(expr, $(...))
+            ///this match $("div", $("body")) and $("body div");
 			} else if ( !context || context.jquery ) {
-				return (context || rootjQuery).find( selector );
+                return (context || rootjQuery).find( selector );
 
 			// HANDLE: $(expr, context)
 			// (which is just equivalent to: $(context).find(expr)
+            /// this match jQuery("div", "body");
 			} else {
 				return jQuery( context ).find( selector );
 			}
@@ -180,12 +194,17 @@ function init ( selector, context ) {
 		} else if ( jQuery.isFunction( selector ) ) {
 			return rootjQuery.ready( selector );
 		}
-
+        ///this is case selector is not string, and it is also not a function
+        ///this match jQuery({ name : "x" })
+        /// or jQuery([1, 2, 3]);
 		if (selector.selector !== undefined) {
 			this.selector = selector.selector;
 			this.context = selector.context;
 		}
 
+        ///now "this" is empty jQuery object
+        ///makeArray is to push selector object into jQuery internal
+        ///array like data structure
 		return jQuery.makeArray( selector, this );
 	}
 
@@ -210,6 +229,7 @@ jQuery.fn = init.prototype = {
 
 	// Get the Nth element in the matched element set OR
 	// Get the whole matched element set as a clean array
+    ///get() is same as toArray
 	get: function( num ) {
 		return num == null ?
 
@@ -222,8 +242,12 @@ jQuery.fn = init.prototype = {
 
 	// Take an array of elements and push it onto the stack
 	// (returning the new matched element set)
+    ///the purpose of this method is to create a new jQuery object
+    ///which points to current object
 	pushStack: function( elems, name, selector ) {
 		// Build a new jQuery matched element set
+        ///first create a empty jQuery object
+        ///and wrap elems into it
 		var ret = jQuery();
 
 		if ( jQuery.isArray( elems ) ) {
@@ -239,6 +263,8 @@ jQuery.fn = init.prototype = {
 		ret.context = this.context;
 
 		if ( name === "find" ) {
+            ///$("div").find("p"), will call this method
+            /// so that selector is like "div p"
 			ret.selector = this.selector + (this.selector ? " " : "") + selector;
 		} else if ( name ) {
 			ret.selector = this.selector + "." + name + "(" + selector + ")";
@@ -255,12 +281,16 @@ jQuery.fn = init.prototype = {
 		return jQuery.each( this, callback, args );
 	},
 
+    ///the function server two purposes
+    ///the first time it is called, it attach rea
 	ready: function() {
 		// Attach the listeners
 		jQuery.bindReady();
 
 		// Change ready & apply
-		return ( jQuery.fn.ready = readyList.done ).apply( this , arguments );
+        ///redivert this read function to  readyList.done
+        jQuery.fn.ready = readyList.done;
+		return readyList.done.apply( this , arguments );
 	},
 
 	eq: function( i ) {
@@ -414,6 +444,7 @@ jQuery.extend({
 	},
 
 	bindReady: function() {
+        ///this function is only run once
 		if ( readyBound ) {
 			return;
 		}
@@ -590,11 +621,16 @@ jQuery.extend({
 		}
 	},
 
+    ///test a html element has nodeName like name
 	nodeName: function( elem, name ) {
 		return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
 	},
 
 	// args is for internal usage only
+    ///during enumeration if the callback return false
+    ///it will abort the rest items
+    ///if args present, it will be passed in to callback
+    ///for example $.each([1, 2, 3], function (n) { alert(this*n); }, [10] );
 	each: function( object, callback, args ) {
 		var name, i = 0,
 			length = object.length,
@@ -657,10 +693,12 @@ jQuery.extend({
 			// in Safari 2 (See: #3039)
 			// Tweaked logic slightly to handle Blackberry 4.7 RegExp issues #6930
 			var type = jQuery.type(array);
-
 			if ( array.length == null || type === "string" || type === "function" || type === "regexp" || jQuery.isWindow( array ) ) {
+                ///if it is not really an array
+                ///just push it into the jQuery object
 				push.call( ret, array );
 			} else {
+                ///if it is Array
 				jQuery.merge( ret, array );
 			}
 		}
@@ -668,6 +706,7 @@ jQuery.extend({
 		return ret;
 	},
 
+    ///return the position of element in an array
 	inArray: function( elem, array ) {
 		if ( array.indexOf ) {
 			return array.indexOf( elem );
@@ -682,26 +721,39 @@ jQuery.extend({
 		return -1;
 	},
 
+    ///copy elements in second to first
+    ///and return first, both first and second is array like
+    ///object, eg. they have indexer
 	merge: function( first, second ) {
-		var i = first.length,
+		///destination index start with first.length
+        var i = first.length,
 			j = 0;
 
 		if ( typeof second.length === "number" ) {
+            ///if second is a array like object
+            ///use for to copy second from 0 to second.length
 			for ( var l = second.length; j < l; j++ ) {
 				first[ i++ ] = second[ j ];
 			}
 
 		} else {
+            ///if second is not array like object
+            ///use while
 			while ( second[j] !== undefined ) {
 				first[ i++ ] = second[ j++ ];
 			}
 		}
 
+        ///update first length explicitly
+        ///because it might not by updated automatically
 		first.length = i;
 
 		return first;
 	},
 
+    ///pick elements from an array to form a new array, these
+    //element satisfied a condition, and return new array
+    ///original array is not changed
 	grep: function( elems, callback, inv ) {
 		var ret = [], retVal;
 		inv = !!inv;
@@ -815,10 +867,10 @@ jQuery.extend({
 			deferred  = {
 
 				// done( f1, f2, ...)
+                ///done is to push function in into list
+                ///and invoke them optionally
 				done: function () {
-
 					if ( ! cancelled ) {
-
 						var args = arguments,
 							i,
 							length,
@@ -963,6 +1015,7 @@ jQuery.extend({
 });
 
 // Create readyList deferred
+//change readyList to _Deferred object
 readyList = jQuery._Deferred();
 
 // Populate the class2type map
