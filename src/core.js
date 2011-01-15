@@ -58,7 +58,7 @@ var jQuery = function( selector, context ) {
 	browserMatch,
 
 	// Has the ready events already been bound?
-	readyBound = false,
+	//readyBound = false,
 
 	// The deferred used on DOM ready
 	readyList,
@@ -281,17 +281,7 @@ jQuery.fn = init.prototype = {
 		return jQuery.each( this, callback, args );
 	},
 
-    ///the function server two purposes
-    ///the first time it is called, it attach rea
-	ready: function() {
-		// Attach the listeners
-		jQuery.bindReady();
 
-		// Change ready & apply
-        ///redivert this read function to  readyList.done
-        jQuery.fn.ready = readyList.done;
-		return readyList.done.apply( this , arguments );
-	},
 
 	eq: function( i ) {
 		return i === -1 ?
@@ -443,51 +433,7 @@ jQuery.extend({
 		}
 	},
 
-	bindReady: function() {
-        ///this function is only run once
-		if ( readyBound ) {
-			return;
-		}
 
-		readyBound = true;
-
-		// Catch cases where $(document).ready() is called after the
-		// browser event has already occurred.
-		if ( document.readyState === "complete" ) {
-			// Handle it asynchronously to allow scripts the opportunity to delay ready
-			return setTimeout( jQuery.ready, 1 );
-		}
-
-		// Mozilla, Opera and webkit nightlies currently support this event
-		if ( document.addEventListener ) {
-			// Use the handy event callback
-			document.addEventListener( "DOMContentLoaded", DOMContentLoaded, false );
-
-			// A fallback to window.onload, that will always work
-			window.addEventListener( "load", jQuery.ready, false );
-
-		// If IE event model is used
-		} else if ( document.attachEvent ) {
-			// ensure firing before onload,
-			// maybe late but safe also for iframes
-			document.attachEvent("onreadystatechange", DOMContentLoaded);
-
-			// A fallback to window.onload, that will always work
-			window.attachEvent( "onload", jQuery.ready );
-
-			// If IE and not a frame
-			// continually check to see if the document is ready
-			var toplevel = false;
-
-			try {
-				toplevel = window.frameElement == null;
-			} catch(e) {}
-
-			if ( document.documentElement.doScroll && toplevel ) {
-				doScrollCheck();
-			}
-		}
-	},
 
 	// See test/unit/core.js for details concerning isFunction.
 	// Since version 1.3, DOM methods and functions like alert
@@ -1014,9 +960,8 @@ jQuery.extend({
 	browser: {}
 });
 
-// Create readyList deferred
-//change readyList to _Deferred object
-readyList = jQuery._Deferred();
+
+
 
 // Populate the class2type map
 jQuery.each("Boolean Number String Function Array Date RegExp Object".split(" "), function(i, name) {
@@ -1050,22 +995,67 @@ if ( !rwhite.test( "\xA0" ) ) {
 // All jQuery objects should point back to these
 rootjQuery = jQuery(document);
 
-// Cleanup functions for the document ready method
-if ( document.addEventListener ) {
-	DOMContentLoaded = function() {
-		document.removeEventListener( "DOMContentLoaded", DOMContentLoaded, false );
-		jQuery.ready();
-	};
+// Create readyList deferred
+//change readyList to _Deferred object
+readyList = jQuery._Deferred();
+jQuery.fn.ready = readyList.done;
 
-} else if ( document.attachEvent ) {
-	DOMContentLoaded = function() {
-		// Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
-		if ( document.readyState === "complete" ) {
-			document.detachEvent( "onreadystatechange", DOMContentLoaded );
-			jQuery.ready();
-		}
-	};
-}
+(function bindReady() {
+    // Cleanup functions for the document ready method
+    if ( document.addEventListener ) {
+        DOMContentLoaded = function() {
+            document.removeEventListener( "DOMContentLoaded", DOMContentLoaded, false );
+            jQuery.ready();
+        };
+
+    } else if ( document.attachEvent ) {
+        DOMContentLoaded = function() {
+            // Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
+            if ( document.readyState === "complete" ) {
+                document.detachEvent( "onreadystatechange", DOMContentLoaded );
+                jQuery.ready();
+            }
+        };
+    }
+
+    // Catch cases where $(document).ready() is called after the
+    // browser event has already occurred.
+    if ( document.readyState === "complete" ) {
+        // Handle it asynchronously to allow scripts the opportunity to delay ready
+        return setTimeout( jQuery.ready, 1 );
+    }
+
+    // Mozilla, Opera and webkit nightlies currently support this event
+    if ( document.addEventListener ) {
+        // Use the handy event callback
+        document.addEventListener( "DOMContentLoaded", DOMContentLoaded, false );
+
+        // A fallback to window.onload, that will always work
+        window.addEventListener( "load", jQuery.ready, false );
+
+    // If IE event model is used
+    } else if ( document.attachEvent ) {
+        // ensure firing before onload,
+        // maybe late but safe also for iframes
+        document.attachEvent("onreadystatechange", DOMContentLoaded);
+
+        // A fallback to window.onload, that will always work
+        window.attachEvent( "onload", jQuery.ready );
+
+        // If IE and not a frame
+        // continually check to see if the document is ready
+        var toplevel = false;
+
+        try {
+            toplevel = window.frameElement == null;
+        } catch(e) {}
+
+        if ( document.documentElement.doScroll && toplevel ) {
+            doScrollCheck();
+        }
+    }
+})();
+
 
 // The DOM ready check for Internet Explorer
 function doScrollCheck() {
