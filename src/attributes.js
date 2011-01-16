@@ -271,13 +271,16 @@ jQuery.extend({
 		offset: true
 	},
 
-	attr: function( elem, name, value, pass ) {
+	attr: function( elem, name, value) {
 		// don't get/set attributes on text, comment and attribute nodes
 		if ( !elem || elem.nodeType === 3 || elem.nodeType === 8 || elem.nodeType === 2 ) {
 			return undefined;
 		}
 
-		if ( pass && name in jQuery.attrFn ) {
+        ///jQuery.attr(elem, "text", "hello", true);
+        ///will convert to jQuery(elem).text(value)
+        //if ( pass && name in jQuery.attrFn ) {
+		if (name in jQuery.attrFn ) {
 			return jQuery(elem)[name](value);
 		}
 
