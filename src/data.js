@@ -144,7 +144,7 @@ jQuery.extend({
 jQuery.fn.extend({
 	data: function( key, value ) {
 		var data = null;
-
+        ///jQuery("x").data() //get data
 		if ( typeof key === "undefined" ) {
 			if ( this.length ) {
 				data = jQuery.data( this[0] );
@@ -170,7 +170,10 @@ jQuery.fn.extend({
 			});
 		}
 
+
 		var parts = key.split(".");
+        ///if parts has ".", the second part changed to ".second"
+        ///otherwise, parts is ""
 		parts[1] = parts[1] ? "." + parts[1] : "";
 
 		if ( value === undefined ) {
@@ -205,6 +208,8 @@ jQuery.fn.extend({
 	}
 });
 
+///merge html5 data attribute with jQuery data object associated
+///with the element
 function dataAttr( elem, key, data ) {
 	// If nothing was found internally, try to fetch any
 	// data from the HTML5 data-* attribute

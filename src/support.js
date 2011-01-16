@@ -31,11 +31,13 @@
 		tbody: !div.getElementsByTagName("tbody").length,
 
 		// Make sure that link elements get serialized correctly by innerHTML
-		// This requires a wrapper element in IE
+		// This requires a wrapper element in IE,
+        ///in IE, this is false
 		htmlSerialize: !!div.getElementsByTagName("link").length,
 
 		// Get the style information from getAttribute
 		// (IE uses .cssText insted)
+        ///ie does not support getAttribute("style"), it support .cssText
 		style: /red/.test( a.getAttribute("style") ),
 
 		// Make sure that URLs aren't manipulated
