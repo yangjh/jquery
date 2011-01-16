@@ -738,6 +738,10 @@ var jQuery = (function() {
 
         // Mutifunctional method to get and set values to a collection
         // The value/s can be optionally by executed if its a function
+        ///value can be just simple value or a value function
+        ///a value function is like function (index, oldValue) { //this == elem }
+        ///fn is getter and setter, when it is getter fn(elem, key)
+        ///when it is setter, it is fn(elem, key, newValue, pass)
         access: function(elems, key, value, exec, fn, pass) {
             var length = elems.length;
 
@@ -752,11 +756,19 @@ var jQuery = (function() {
             // Setting one attribute
             if (value !== undefined) {
                 // Optionally, function values get executed if exec is true
-                ///exec is true when pass is null, exec is true, and value is a function
+                ///exec is true when pass == null, exec == true, and value == function
                 exec = !pass && exec && jQuery.isFunction(value);
 
                 for (var i = 0; i < length; i++) {
-                    fn(elems[i], key, exec ? value.call(elems[i], i, fn(elems[i], key)) : value, pass);
+                    var newValue;
+                    if (exec) {
+                        var oldValue = fn(elems[i], key);
+                        newValue = value.call(elems[i], i, oldValue);
+                    } else {
+                        newValue = value;
+                    }
+
+                    fn(elems[i], key, newValue, pass);
                 }
 
                 return elems;
