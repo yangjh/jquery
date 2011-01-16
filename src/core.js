@@ -19,9 +19,6 @@ var jQuery = (function() {
         // (both of which we optimize for)
             quickExpr = /^(?:[^<]*(<[\w\W]+>)[^>]*$|#([\w\-]+)$)/,
 
-        // Is it a simple selector
-            isSimple = /^.[^:#\[\.,]*$/,
-
         // Check if a string has a non-whitespace character in it
             rnotwhite = /\S/,
             rwhite = /\s/,
