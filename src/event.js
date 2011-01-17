@@ -102,14 +102,15 @@ jQuery.event = {
 		var type, i = 0, namespaces;
 
 		while ( (type = types[ i++ ]) ) {
-			handleObj = handleObjIn ?
-				jQuery.extend({}, handleObjIn) :
-				{ handler: handler, data: data };
+			handleObj = handleObjIn ? jQuery.extend({}, handleObjIn) :
+				        { handler: handler, data: data };
 
 			// Namespaced event handlers
 			if ( type.indexOf(".") > -1 ) {
 				namespaces = type.split(".");
+                ///get the first part of namespace as type,
 				type = namespaces.shift();
+                ///use the remaining parts as namespace
 				handleObj.namespace = namespaces.slice(0).sort().join(".");
 
 			} else {
@@ -133,20 +134,25 @@ jQuery.event = {
 				// Check for a special event handler
 				// Only use addEventListener/attachEvent if the special
 				// events handler returns false
+                ///special.setup is run before html element event binding
 				if ( !special.setup || special.setup.call( elem, data, namespaces, eventHandle ) === false ) {
 					// Bind the global event handler to the element
+                    ///firefox, webkit
 					if ( elem.addEventListener ) {
 						elem.addEventListener( type, eventHandle, false );
-
+                    ///IE
 					} else if ( elem.attachEvent ) {
 						elem.attachEvent( "on" + type, eventHandle );
 					}
 				}
 			}
 
+            ///special.add is run
 			if ( special.add ) {
 				special.add.call( elem, handleObj );
-
+                ///the handleObj.handler might already changed in the special.add.call
+                ///but the handleObj is not changed, so we need to ensure handleObj.handler.guid
+                ///still present
 				if ( !handleObj.handler.guid ) {
 					handleObj.handler.guid = handler.guid;
 				}
@@ -412,6 +418,7 @@ jQuery.event = {
 		}
 	},
 
+    ///the handler of all event
 	handle: function( event ) {
 		var all, handlers, namespaces, namespace_re, events,
 			namespace_sort = [],

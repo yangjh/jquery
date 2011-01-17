@@ -36,6 +36,7 @@ jQuery.fn.extend({
 		});
 	},
 
+    ///value can be a function like function(index, oldValue { //this === this_elem}
 	addClass: function( value ) {
 		if ( jQuery.isFunction(value) ) {
 			return this.each(function(i) {
@@ -51,14 +52,17 @@ jQuery.fn.extend({
 				var elem = this[i];
 
 				if ( elem.nodeType === 1 ) {
+                    ///if element does not have any class yet
 					if ( !elem.className ) {
 						elem.className = value;
-
 					} else {
+                        ///if elem already has class applied
 						var className = " " + elem.className + " ",
 							setClass = elem.className;
 
 						for ( var c = 0, cl = classNames.length; c < cl; c++ ) {
+                            ///check if class has been applied already, if not
+                            ///add the class
 							if ( className.indexOf( " " + classNames[c] + " " ) < 0 ) {
 								setClass += " " + classNames[c];
 							}
@@ -260,6 +264,7 @@ jQuery.fn.extend({
 });
 
 jQuery.extend({
+    ///the following attribute support function
 	attrFn: {
 		val: true,
 		css: true,
@@ -271,7 +276,7 @@ jQuery.extend({
 		offset: true
 	},
 
-	attr: function( elem, name, value) {
+	attr: function( elem, name, value ) {
 		// don't get/set attributes on text, comment and attribute nodes
 		if ( !elem || elem.nodeType === 3 || elem.nodeType === 8 || elem.nodeType === 2 ) {
 			return undefined;
@@ -279,7 +284,6 @@ jQuery.extend({
 
         ///jQuery.attr(elem, "text", "hello", true);
         ///will convert to jQuery(elem).text(value)
-        //if ( pass && name in jQuery.attrFn ) {
 		if (name in jQuery.attrFn ) {
 			return jQuery(elem)[name](value);
 		}
